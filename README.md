@@ -4,7 +4,7 @@
 
 ### Technical hiring, grounded in the code candidates actually write.
 
-An evidence-first technical vetting platform that analyzes a candidate’s GitHub repository against a role-specific engineering rubric—and returns scored findings with source-file references.
+An evidence-first technical vetting platform that analyzes a candidate’s GitHub repository against a role-specific engineering rubric and returns scored findings with source-file references.
 
 ![Evidence-based evaluation](https://img.shields.io/badge/evaluation-evidence--based-1BA94C?style=flat-square)
 ![Languages](https://img.shields.io/badge/code-Python%20%7C%20JavaScript%20%7C%20TypeScript-1BA94C?style=flat-square)
