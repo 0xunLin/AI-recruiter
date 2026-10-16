@@ -1,6 +1,6 @@
 <div align="center">
 
-# AI Recruiter
+# Recruise
 
 ### Technical hiring, grounded in the code candidates actually write.
 
