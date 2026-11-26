@@ -1,4 +1,4 @@
-# RECRUISE — Resume-to-Code Verification & Anti-Vibe-Coding Platform
+# RECRUISE — Resume-to-Code Verification Platform
 
 An end-to-end, multi-tenant technical vetting platform that extracts project claims and embedded GitHub links from candidate resumes, verifies contributions surgically via GitHub Trees/Patch APIs + Tree-sitter ASTs + `pgvector` (HNSW), scores candidates out of 10 with a 5-node **LangGraph** agent, filters the **top 30%** shortlist, and exposes tenant-isolated **FastMCP** tools (including anti-vibe-coding interview probes) for **Cursor** and **Claude Desktop**.
 
