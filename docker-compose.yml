@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
   db:
-    # We use a pre-packaged Postgres image that already has pgvector compiled.
     image: pgvector/pgvector:pg16
     container_name: recruiter_postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -13,17 +10,142 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "postgres_data:/var/lib/postgresql/data"
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d recruiter_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: recruiter_pgbouncer
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: recruiter_db
+      LISTEN_PORT: 6432
+      POOL_MODE: transaction
+      AUTH_TYPE: plain
+      MAX_CLIENT_CONN: 500
+      DEFAULT_POOL_SIZE: 25
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    ports:
+      - "6432:6432"
 
   redis:
-    # Alpine is a stripped-down, ultra-lightweight Linux distribution.
     image: redis:7-alpine
     container_name: recruiter_redis
-    restart: always
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
-      - "redis_data:/data"
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build:
+      context: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DIRECT_DATABASE_URL: postgresql+psycopg://postgres:password@db:5432/recruiter_db
+      DATABASE_URL: postgresql+psycopg://postgres:password@db:5432/recruiter_db
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+
+  api:
+    build:
+      context: ./backend
+    container_name: recruiter_api
+    restart: unless-stopped
+    depends_on:
+      pgbouncer:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:password@pgbouncer:6432/recruiter_db
+      DIRECT_DATABASE_URL: postgresql+psycopg://postgres:password@db:5432/recruiter_db
+      USE_PGBOUNCER: "true"
+      REDIS_BROKER_URL: redis://redis:6379/0
+      REDIS_BACKEND_URL: redis://redis:6379/1
+      REDIS_RATE_LIMIT_URL: redis://redis:6379/2
+    ports:
+      - "8000:8000"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+
+  worker-ingestion:
+    build:
+      context: ./backend
+    container_name: recruiter_worker_ingestion
+    restart: unless-stopped
+    depends_on:
+      pgbouncer:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:password@pgbouncer:6432/recruiter_db
+      USE_PGBOUNCER: "true"
+      REDIS_BROKER_URL: redis://redis:6379/0
+      REDIS_BACKEND_URL: redis://redis:6379/1
+      REDIS_RATE_LIMIT_URL: redis://redis:6379/2
+    command: ["celery", "-A", "app.celery_app", "worker", "-Q", "queue_ingestion", "--concurrency=4", "--loglevel=info"]
+
+  worker-evaluation:
+    build:
+      context: ./backend
+    container_name: recruiter_worker_evaluation
+    restart: unless-stopped
+    depends_on:
+      pgbouncer:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:password@pgbouncer:6432/recruiter_db
+      USE_PGBOUNCER: "true"
+      REDIS_BROKER_URL: redis://redis:6379/0
+      REDIS_BACKEND_URL: redis://redis:6379/1
+      REDIS_RATE_LIMIT_URL: redis://redis:6379/2
+    command: ["celery", "-A", "app.celery_app", "worker", "-Q", "queue_evaluation", "--concurrency=4", "--loglevel=info"]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: recruiter_frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
 
 volumes:
   postgres_data:

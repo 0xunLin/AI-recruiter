@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light dark;
+
+  --canvas-bg: light-dark(#ffffff, #0d0d0d);
+  --surface-bg: light-dark(#ffffff, #1a1a1a);
+  --surface-subtle: light-dark(#fafafa, #141414);
+  --surface-hover: light-dark(#f5f5f5, #262626);
+  --ink-primary: light-dark(#000000, #ffffff);
+  --ink-muted: light-dark(#525252, #a3a3a3);
+  --ink-placeholder: #737373;
+  --border-card: light-dark(#000000, #333333);
+  --border-interactive: light-dark(#000000, #555555);
+  --border-heavy: light-dark(#000000, #ffffff);
+  --divider-rule: light-dark(#e5e5e5, #333333);
+  --solid-bg: light-dark(#000000, #ffffff);
+  --solid-fg: light-dark(#ffffff, #000000);
+  --solid-muted: light-dark(#d4d4d4, #262626);
+  --status-success: #2e7d32;
+  --status-success-text: light-dark(#2e7d32, #4ade80);
+  --status-danger: #ff2a6d;
+  --terminal-bg: #121614;
+  --terminal-fg: #4ade80;
+  --scrollbar-track: light-dark(#f5f5f5, #141414);
+  --scrollbar-thumb: light-dark(#737373, #525252);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]) {
+  color-scheme: dark;
+}
+
+:root:has(> head > meta[name="color-scheme"][content="light"]) {
+  color-scheme: light;
+}
+
+/* Fallback for browsers without CSS light-dark() */
+@supports not (color: light-dark(white, black)) {
+  :root {
+    --canvas-bg: #0d0d0d;
+    --surface-bg: #1a1a1a;
+    --surface-subtle: #141414;
+    --surface-hover: #262626;
+    --ink-primary: #ffffff;
+    --ink-muted: #a3a3a3;
+    --border-card: #333333;
+    --border-interactive: #555555;
+    --border-heavy: #ffffff;
+    --divider-rule: #333333;
+    --solid-bg: #ffffff;
+    --solid-fg: #000000;
+    --solid-muted: #262626;
+    --status-success-text: #4ade80;
+    --scrollbar-track: #141414;
+    --scrollbar-thumb: #525252;
+  }
+
+  :root:has(> head > meta[name="color-scheme"][content="light"]) {
+    --canvas-bg: #ffffff;
+    --surface-bg: #ffffff;
+    --surface-subtle: #fafafa;
+    --surface-hover: #f5f5f5;
+    --ink-primary: #000000;
+    --ink-muted: #525252;
+    --border-card: #000000;
+    --border-interactive: #000000;
+    --border-heavy: #000000;
+    --divider-rule: #e5e5e5;
+    --solid-bg: #000000;
+    --solid-fg: #ffffff;
+    --solid-muted: #d4d4d4;
+    --status-success-text: #2e7d32;
+    --scrollbar-track: #f5f5f5;
+    --scrollbar-thumb: #737373;
+  }
+}
+
+html,
+body {
+  background-color: var(--canvas-bg);
+  color: var(--ink-primary);
+  font-family: "Satoshi", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+::selection {
+  background-color: var(--solid-bg);
+  color: var(--solid-fg);
+}
+
+/* 1. Headings & Hero Metrics: Clean neo-grotesque sans-serif */
+.display-heading {
+  font-family: "Satoshi", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+/* 2. Subtitles, Descriptions & Notes: Editorial serif italics */
+.editorial-note {
+  font-family: "Newsreader", Georgia, "Times New Roman", Times, serif;
+  font-style: italic;
+}
+
+/* 3. Data, Labels, Code & Controls: Monospace uppercase micro-labels & metrics */
+.spec-mono {
+  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.sui-spec-label {
+  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Utilitarian Brutalist Cards, Surfaces & Controls (0px radius, zero shadow) */
+.wire-canvas {
+  background-color: var(--canvas-bg);
+  color: var(--ink-primary);
+}
+
+.wire-header {
+  background-color: var(--canvas-bg);
+  border-bottom: 2px solid var(--border-heavy);
+}
+
+.wire-card {
+  background-color: var(--surface-bg);
+  border: 1px solid var(--border-card);
+  border-radius: 0px;
+}
+
+.wire-card-heavy {
+  background-color: var(--surface-bg);
+  border: 2px solid var(--border-heavy);
+  border-radius: 0px;
+}
+
+.wire-card-solid {
+  background-color: var(--solid-bg);
+  color: var(--solid-fg);
+  border: 2px solid var(--border-heavy);
+  border-radius: 0px;
+}
+
+.wire-btn {
+  border: 1px solid var(--border-interactive);
+  border-radius: 0px;
+  background-color: var(--surface-bg);
+  color: var(--ink-primary);
+  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  transition: background-color 120ms linear, color 120ms linear, border-color 120ms linear;
+}
+
+.wire-btn:hover:not(:disabled) {
+  background-color: var(--solid-bg);
+  color: var(--solid-fg);
+  border-color: var(--border-heavy);
+}
+
+.wire-btn-primary {
+  border: 1px solid var(--border-heavy);
+  border-radius: 0px;
+  background-color: var(--solid-bg);
+  color: var(--solid-fg);
+  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  transition: background-color 120ms linear, color 120ms linear, border-color 120ms linear;
+}
+
+.wire-btn-primary:hover:not(:disabled) {
+  background-color: var(--surface-bg);
+  color: var(--ink-primary);
+  border-color: var(--border-heavy);
+}
+
+.wire-input {
+  border: 1px solid var(--border-interactive);
+  border-radius: 0px;
+  background-color: var(--canvas-bg);
+  color: var(--ink-primary);
+}
+
+.wire-input::placeholder {
+  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink-placeholder);
+}
+
+.wire-tag {
+  border: 1px solid var(--border-interactive);
+  border-radius: 0px;
+  background-color: var(--surface-bg);
+  color: var(--ink-primary);
+}
+
+.wire-tag-solid {
+  border: 1px solid var(--border-heavy);
+  border-radius: 0px;
+  background-color: var(--solid-bg);
+  color: var(--solid-fg);
+}
+
+.wire-terminal {
+  background-color: var(--terminal-bg);
+  color: var(--terminal-fg);
+  border: 1px solid var(--border-card);
+  border-radius: 0px;
+  font-family: "JetBrains Mono", "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Pill-shaped Brutalist Theme Toggle Switch (explicit exception to 0px radius) */
+.wire-switch-track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 22px;
+  padding: 2px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-heavy);
+  background-color: var(--surface-bg);
+  transition: background-color 120ms linear, border-color 120ms linear;
+}
+
+.wire-switch-track[data-checked="true"] {
+  background-color: var(--solid-bg);
+}
+
+.wire-switch-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background-color: var(--ink-primary);
+  transform: translateX(0px);
+  transition: transform 140ms linear, background-color 120ms linear;
+}
+
+.wire-switch-track[data-checked="true"] .wire-switch-thumb {
+  background-color: var(--solid-fg);
+  transform: translateX(22px);
+}
+
+/* Native <dialog> modal scroll-containment & flat high-contrast backdrop */
+dialog:modal {
+  overscroll-behavior: contain;
+  margin: auto;
+  max-height: min(88vh, 920px);
+  border-radius: 0px;
+  background-color: var(--surface-bg);
+  color: var(--ink-primary);
+  border: 2px solid var(--border-heavy);
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgba(0, 0, 0, 0.72);
+}
+
+input:user-invalid,
+textarea:user-invalid,
+select:user-invalid {
+  border-color: var(--status-danger);
+}
+
+:focus-visible {
+  outline: 2px solid var(--border-heavy);
+  outline-offset: 2px;
+}
+
+/* Accessible responsive table container */
+.table-wrapper {
+  overflow: auto;
+  max-inline-size: 100%;
+  max-block-size: min(560px, 75vh);
+  container-type: inline-size;
+}
+
+.table-wrapper table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-wrapper thead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+}
+
+@container (width < 640px) {
+  .responsive-apps-table,
+  .responsive-apps-table thead,
+  .responsive-apps-table tbody,
+  .responsive-apps-table tr,
+  .responsive-apps-table th,
+  .responsive-apps-table td {
+    display: block;
+  }
+
+  .responsive-apps-table thead {
+    display: none;
+  }
+
+  .responsive-apps-table tbody tr {
+    margin-block-end: 0.75rem;
+    border: 1px solid var(--border-card);
+    padding: 0.875rem;
+  }
+
+  .responsive-apps-table td[data-label]::before {
+    content: attr(data-label) ": ";
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      (function () {
+        var meta = document.querySelector('meta[name="color-scheme"]');
+        if (!meta) return;
+        var stored = null;
+        try {
+          stored = localStorage.getItem("recruise_theme");
+        } catch (e) {}
+        meta.setAttribute("content", stored === "light" || stored === "dark" ? stored : "dark");
+      })();
+    </script>
+    <title>RECRUISE</title>
+    <link
+      rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
+    />
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
